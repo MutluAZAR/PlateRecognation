@@ -3,7 +3,7 @@ import numpy as np
 from scipy.ndimage import rotate
 
 
-def CorrectAngle(image, delta=2, limit=50):
+def CorrectAngle(image, delta=3, limit=50):
     def determine_score(arr, skew):
         data = rotate(arr, skew, reshape=False, order=0)
         histograms = np.sum(data, axis=1, dtype=float)
