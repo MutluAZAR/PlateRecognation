@@ -63,18 +63,17 @@ def HistogramSegmentation(frm):
     indexes = []
     for k, i in enumerate(copychar):
         final = i[-1]
-        if len(i) > 8:
+        if len(i) > 10:
             indexes.append(i)
             if k < len(copychar) - 1:
-                if copychar[k + 1][0] - final < 5 and (len(i) < 18):
+                if copychar[k + 1][0] - final < 5 and (len(i) < 18) and len(copychar[k + 1]) < 18:
                     i[-1] = copychar[k + 1][-1]
                     copychar.pop(k + 1)
                     indexes[-1] = i
 
-    if len(indexes) == 7:
-        indexes[0][-1] = indexes[1][-1]
-        indexes.pop(1)
-
+    # if len(indexes) == 7:
+    #     indexes[0][-1] = indexes[1][-1]
+    #     indexes.pop(1)
     returned_dict = {}
     c = 0
     for x, k in enumerate(indexes):

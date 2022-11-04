@@ -15,7 +15,7 @@ class Preprocess:
             hist.append(k.count(True))
 
         hist = np.array(hist)[::-1]
-        indexes.append(20 - np.argmin(hist))
+        indexes.append(25 - np.argmin(hist))
 
         hist = []
         for row in frm[int(frm.shape[0]/2):, :]:
@@ -23,7 +23,7 @@ class Preprocess:
             hist.append(k.count(True))
 
         hist = np.array(hist)
-        indexes.append(20 + np.argmin(hist))
+        indexes.append(25 + np.argmin(hist))
 
         if len(indexes) > 1:
             frm = frm[indexes[0]:indexes[1], :]
@@ -92,7 +92,7 @@ class Preprocess:
         rtrnd[2:returned.shape[0] + 2, 2:returned.shape[1] + 2] = returned
         return rtrnd
 
-    def Preprocess(self, imsize=(200, 40)):
+    def Preprocess(self, imsize=(300, 50)):
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)  # grayscale
         zone_copy = CorrectAngle(gray)[1]  # angle correction
         blur = cv2.GaussianBlur(zone_copy, (3, 3), 0)  # blurring img
