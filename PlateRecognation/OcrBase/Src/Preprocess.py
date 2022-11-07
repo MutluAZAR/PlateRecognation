@@ -1,4 +1,7 @@
 import copy
+
+import cv2
+
 from .AngleCorrection import *
 
 
@@ -66,7 +69,7 @@ class Preprocess:
         for x, h in enumerate(hist):
             if h > 0:
                 counter += 1
-            elif counter < 5 and h <= 0:
+            elif counter < 9 and h <= 0:
                 indexes.append(x)
                 counter = 0
         p = []
@@ -77,7 +80,7 @@ class Preprocess:
         for x, h in enumerate(hist[::-1]):
             if h > 0:
                 counter += 1
-            elif x < 5:
+            elif x < 9:
                 indexes.append(cropped.T.shape[0] - x)
             else:
                 counter = 0
@@ -95,15 +98,16 @@ class Preprocess:
     def Preprocess(self, imsize=(300, 50)):
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)  # grayscale
         zone_copy = CorrectAngle(gray)[1]  # angle correction
-        blur = cv2.GaussianBlur(zone_copy, (3, 3), 0)  # blurring img
-        blur = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C | cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 12)  # binary img
-        blur = cv2.equalizeHist(blur)  # histogram equalization
+        blur = cv2.adaptiveThreshold(zone_copy, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 12)  # binary img
+        # blur = cv2.equalizeHist(blur)  # histogram equalization
         zone_copy = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]  # other threshold for binary img
-        zone_copy = cv2.resize(zone_copy, imsize, interpolation=cv2.INTER_NEAREST)  # resize img
+        zone_copy = cv2.resize(zone_copy, imsize, interpolation=cv2.INTER_AREA)  # resize
         for_ocr = self.__HistogramicClear(zone_copy)  # image clearing
         for_ocr = self.__Preprocess(for_ocr)
-        for_ocr = cv2.resize(for_ocr, imsize, interpolation=cv2.INTER_NEAREST)  # resize img
+        for_ocr = cv2.resize(for_ocr, imsize, interpolation=cv2.INTER_AREA)  # resize img
+        for_ocr = cv2.morphologyEx(for_ocr, cv2.MORPH_DILATE, kernel=np.ones((2, 2)), iterations=1)  # apply dilation
         crop = cv2.morphologyEx(for_ocr, cv2.MORPH_ERODE, kernel=np.ones((2, 2)), iterations=1)  # apply erosion
-        for_ocr = cv2.morphologyEx(crop, cv2.MORPH_DILATE, kernel=np.ones((2, 2)), iterations=1)  # apply dilation
-        return for_ocr
+        # cv2.imshow("image", crop)
+        # cv2.waitKey()
+        return crop
 
